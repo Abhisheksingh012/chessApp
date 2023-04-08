@@ -9,6 +9,9 @@ export default class Engine {
                 return this.knightMove(initialPosition,movedPosition,team,currentBoard);
             case PieceType.BISHOP:
                 return  this.bishopMove(initialPosition,movedPosition,team,currentBoard);
+            case PieceType.ROOK:
+                return  this.rookMove(initialPosition,movedPosition,team,currentBoard);
+
             default:
                 return false
         }
@@ -74,14 +77,31 @@ export default class Engine {
         if(Math.abs(desiredPosition.x-currentPosition.x)!==Math.abs(desiredPosition.y-currentPosition.y) || !this.isTileEmptyOrOccupiedByOpponent(desiredPosition,team,currentBoard)){
             return false;
         }
-        const directionX=desiredPosition.x-currentPosition.x>=0?1:-1;
-        const directionY=desiredPosition.y-currentPosition.y>=0?1:-1;
-        let initialValue= {x:currentPosition.x+directionX,y:currentPosition.y+directionY};
-        while(initialValue.x!==desiredPosition.x && initialValue.y!==desiredPosition.y){
+        const direction={x:desiredPosition.x-currentPosition.x>=0?1:-1,y:desiredPosition.y-currentPosition.y>=0?1:-1};
+        return this.commonMovementLogic(currentPosition,desiredPosition,direction,currentBoard);
+    }
+
+    rookMove(currentPosition:Position,desiredPosition:Position, team: TeamType,currentBoard: Piece[]){
+        if(desiredPosition.x!=currentPosition.x && desiredPosition.y!=currentPosition.y || !this.isTileEmptyOrOccupiedByOpponent(desiredPosition,team,currentBoard)){
+            return false;
+        }
+        let direction={x:0,y:0};
+        if(desiredPosition.x===currentPosition.x){
+            direction.x=0;
+            direction.y=desiredPosition.y-currentPosition.y>=0?1:-1;
+        }else{
+            direction.y=0;
+            direction.x=desiredPosition.x-currentPosition.x>=0?1:-1;
+        }
+       return this.commonMovementLogic(currentPosition,desiredPosition,direction,currentBoard);
+    }
+    commonMovementLogic(currentPosition:Position,desiredPosition:Position,direction:Position,currentBoard:Piece[]){
+        let initialValue= {x:currentPosition.x+direction.x,y:currentPosition.y+direction.y};
+        while(initialValue.x!==desiredPosition.x || initialValue.y!==desiredPosition.y){
             if(this.isTileAlreadyOccupied(initialValue,currentBoard)){
                 return false;
             }
-            initialValue={x:initialValue.x+directionX,y:initialValue.y+directionY}
+            initialValue={x:initialValue.x+direction.x,y:initialValue.y+direction.y}
         }
         return true
     }
