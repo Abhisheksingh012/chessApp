@@ -6,7 +6,9 @@ export default class Engine {
             case PieceType.PAWN:
                 return this.pawnMove(initialPosition.x, initialPosition.y, movedPosition.x, movedPosition.y, team,currentBoard);
             case PieceType.KNIGHT:
-                return this.knightMove(initialPosition,movedPosition,team,currentBoard)
+                return this.knightMove(initialPosition,movedPosition,team,currentBoard);
+            case PieceType.BISHOP:
+                return  this.bishopMove(initialPosition,movedPosition,team,currentBoard);
             default:
                 return false
         }
@@ -67,5 +69,20 @@ export default class Engine {
                return true;
            }
        }
+    }
+    bishopMove(currentPosition:Position,desiredPosition:Position, team: TeamType,currentBoard: Piece[]){
+        if(Math.abs(desiredPosition.x-currentPosition.x)!==Math.abs(desiredPosition.y-currentPosition.y) || !this.isTileEmptyOrOccupiedByOpponent(desiredPosition,team,currentBoard)){
+            return false;
+        }
+        const directionX=desiredPosition.x-currentPosition.x>=0?1:-1;
+        const directionY=desiredPosition.y-currentPosition.y>=0?1:-1;
+        let initialValue= {x:currentPosition.x+directionX,y:currentPosition.y+directionY};
+        while(initialValue.x!==desiredPosition.x && initialValue.y!==desiredPosition.y){
+            if(this.isTileAlreadyOccupied(initialValue,currentBoard)){
+                return false;
+            }
+            initialValue={x:initialValue.x+directionX,y:initialValue.y+directionY}
+        }
+        return true
     }
 }
