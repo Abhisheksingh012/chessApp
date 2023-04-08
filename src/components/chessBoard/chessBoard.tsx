@@ -13,6 +13,7 @@ import {
     samePosition,
     verticalPositions
 } from "../../constant";
+import {isEnPassantMove} from "../../chess-engine/rules/generalRules";
 
 
 
@@ -69,7 +70,7 @@ const [activePiece,setActivePiece]=useState<HTMLElement |null>(null)
             let y = Math.abs(Math.ceil((e.clientY - chessBoard.offsetTop - 800) / GRID_SIZE));
             const currentPiece = pieces.find((piece) => samePosition(piece.position,grabPosition));
             if (currentPiece) {
-                const isPassantMove = engine.isEnPassantMove(grabPosition, {x, y}, currentPiece.pieceType, currentPiece.teamType, pieces);
+                const isPassantMove = isEnPassantMove(grabPosition, {x, y}, currentPiece.pieceType, currentPiece.teamType, pieces);
                 const direction = currentPiece.teamType ? 1 : -1;
                 if (isPassantMove) {
                     const updatedPieces = pieces.reduce((result, piece) => {
