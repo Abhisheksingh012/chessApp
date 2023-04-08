@@ -1,10 +1,10 @@
-import {Piece, PieceType, TeamType} from "../components/chessBoard/chessBoard";
+import {Piece, PieceType, Position, samePosition, TeamType} from "../constant";
 
 export default class Engine {
-    isValidMove(prvX: number, prvY: number, nextX: number, nextY: number, type: PieceType, team: TeamType,currentBoard: Piece[]) {
+    isValidMove(initialPosition:Position,movedPosition:Position, type: PieceType, team: TeamType,currentBoard: Piece[]) {
         switch (type) {
             case 0:
-                return this.PawnMove(prvX, prvY, nextX, nextY, type, team,currentBoard)
+                return this.PawnMove(initialPosition.x, initialPosition.y, movedPosition.x, movedPosition.y, type, team,currentBoard)
             default:
                 return false
         }
@@ -12,21 +12,21 @@ export default class Engine {
 
     isTileAlreadyOccupied(x: number, y: number, currentBoard: Piece[]): boolean {
         const piece = currentBoard.find((piece: Piece) => {
-            return piece.x === x && piece.y===y;
+            return samePosition(piece.position,{x,y});
         })
         return !!piece;
     }
     isTileOccupiedByOpponent(x: number, y: number,team:TeamType, currentBoard: Piece[]){
         const piece = currentBoard.find((piece: Piece) => {
-            return piece.x === x && piece.y===y && team!==piece.teamType;
+            return samePosition(piece.position,{x,y}) && team!==piece.teamType;
         });
         return !!piece;
     }
-    isEnPassantMove(px:number,py:number,x:number,y:number,type:PieceType,team:TeamType,currentBoard:Piece[]){
+    isEnPassantMove(initialPosition:Position,movedPosition:Position,type:PieceType,team:TeamType,currentBoard:Piece[]){
         const direction = team ? 1 : -1;
-        if(type===PieceType.PAWN && y-py===direction && (x-px===-1 || x-px===1)){
+        if(type===PieceType.PAWN && movedPosition.y-initialPosition.y===direction && (movedPosition.x-initialPosition.x===-1 || movedPosition.x-initialPosition.x===1)){
             const piece=currentBoard.find((piece:Piece)=>{
-                return piece.x===x && piece.y===y-direction && piece.enPassant;
+                return samePosition(piece.position,{x:movedPosition.x,y:movedPosition.y-direction}) && piece.enPassant;
             })
             return !!piece;
         }
