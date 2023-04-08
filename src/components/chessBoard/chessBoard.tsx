@@ -40,11 +40,12 @@ const [activePiece,setActivePiece]=useState<HTMLElement |null>(null)
     }
 
     function movePiece(e: React.MouseEvent) {
+
         const chessBoard=chessBoardRef.current;
 
         if (activePiece && chessBoard) {
-            const minLeft=chessBoard.offsetLeft;
-            const minTop=chessBoard.offsetTop;
+            const minLeft=chessBoard.offsetLeft-25;
+            const minTop=chessBoard.offsetTop-25;
             const minRight=chessBoard.offsetLeft+chessBoard.offsetWidth-80;
             const minBottom=chessBoard.offsetTop+chessBoard.offsetHeight-80;
             const x = e.clientX - 50;
@@ -89,7 +90,7 @@ const [activePiece,setActivePiece]=useState<HTMLElement |null>(null)
                                 piece.position.x = x;
                                 piece.position.y = y;
                                 result.push(piece);
-                            } else if (!(samePosition(piece.position,grabPosition))) {
+                            } else if (!(samePosition(piece.position,{x,y}))) {
                                 result.push(piece);
                             }
                             return result;
