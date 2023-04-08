@@ -11,6 +11,10 @@ export default class Engine {
                 return  this.bishopMove(initialPosition,movedPosition,team,currentBoard);
             case PieceType.ROOK:
                 return  this.rookMove(initialPosition,movedPosition,team,currentBoard);
+            case PieceType.QUEEN:
+                return this.bishopMove(initialPosition,movedPosition,team,currentBoard) || this.rookMove(initialPosition,movedPosition,team,currentBoard);
+            case PieceType.KING:
+                return this.kingMove(initialPosition,movedPosition,team,currentBoard)
 
             default:
                 return false
@@ -94,6 +98,12 @@ export default class Engine {
             direction.x=desiredPosition.x-currentPosition.x>=0?1:-1;
         }
        return this.commonMovementLogic(currentPosition,desiredPosition,direction,currentBoard);
+    }
+    kingMove(currentPosition:Position,desiredPosition:Position, team: TeamType,currentBoard: Piece[]){
+        if(Math.abs(desiredPosition.x-currentPosition.x)<=1 && Math.abs(desiredPosition.y-currentPosition.y)<=1 && this.isTileEmptyOrOccupiedByOpponent(desiredPosition,team,currentBoard)){
+            return true;
+        }
+        return false
     }
     commonMovementLogic(currentPosition:Position,desiredPosition:Position,direction:Position,currentBoard:Piece[]){
         let initialValue= {x:currentPosition.x+direction.x,y:currentPosition.y+direction.y};

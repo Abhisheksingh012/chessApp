@@ -26,11 +26,16 @@ const [activePiece,setActivePiece]=useState<HTMLElement |null>(null)
 
     function grabPiece(e: React.MouseEvent) {
         const element = e.target as HTMLElement;
-        const chessBoard=chessBoardRef.current;
-        if (element.classList.contains("chess-piece") && chessBoard) {
-            setGrabPosition({x:Math.floor((e.clientX-chessBoard.offsetLeft)/GRID_SIZE),y:Math.abs(Math.ceil((e.clientY-chessBoard.offsetTop-800)/GRID_SIZE))})
-            const x = e.clientX - GRID_SIZE/2;
-            const y = e.clientY - GRID_SIZE/2;
+        const chessboard = chessBoardRef.current;
+        if (element.classList.contains("chess-piece") && chessboard) {
+            const grabX = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
+            const grabY = Math.abs(
+                Math.ceil((e.clientY - chessboard.offsetTop - 800) / GRID_SIZE)
+            );
+            setGrabPosition({ x: grabX, y: grabY });
+
+            const x = e.clientX - GRID_SIZE / 2;
+            const y = e.clientY - GRID_SIZE / 2;
             element.style.position = "absolute";
             element.style.left = `${x}px`;
             element.style.top = `${y}px`;
@@ -38,6 +43,7 @@ const [activePiece,setActivePiece]=useState<HTMLElement |null>(null)
             setActivePiece(element);
         }
     }
+
 
     function movePiece(e: React.MouseEvent) {
 
