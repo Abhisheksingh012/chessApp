@@ -4,11 +4,12 @@ import {url} from "inspector";
 interface Props {
     position:number;
     image:string | undefined;
+    highlight:boolean
 }
 
-export default function Tile({position,image}:Props){
+export default function Tile({position,image,highlight}:Props){
     return(
-        <span className={`tile ${(position)%2?'black':'white'}-tile`}>{image && <div className='chess-piece'
-                                                                            style={{backgroundImage: `url(${image})`}}></div>}</span>)
+        <span className={`tile ${(position)%2?'black':'white'}-tile ${highlight?"tile-highlight":''}`}>{image && <div className='chess-piece'
+                                                                            style={{backgroundImage: `url(${image})`}}>{false}</div>}</span>)
 
 }

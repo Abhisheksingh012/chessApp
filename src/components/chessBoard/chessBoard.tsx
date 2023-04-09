@@ -25,10 +25,20 @@ export default function ChessBoard() {
     const modalRef = useRef<HTMLDivElement>(null);
     const engine = new Engine();
 
+    function updateValidMoves() {
+        setPieces((currentPieces) => {
+            return currentPieces.map(p => {
+                p.possibleMoves = engine.getValidMoves(p, currentPieces);
+                return p;
+            });
+        });
+    }
+
     function grabPiece(e: React.MouseEvent) {
         const element = e.target as HTMLElement;
         const chessboard = chessBoardRef.current;
         if (element.classList.contains("chess-piece") && chessboard) {
+            updateValidMoves();
             const grabX = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
             const grabY = Math.abs(
                 Math.ceil((e.clientY - chessboard.offsetTop - 800) / GRID_SIZE)
@@ -175,9 +185,11 @@ export default function ChessBoard() {
                 samePosition(p.position, {x: i, y: j})
             );
             let image = piece ? piece.image : undefined;
+            let currentPiece = activePiece != null ? pieces.find(p => samePosition(p.position, grabPosition)) : undefined;
+            let highlight = currentPiece?.possibleMoves ?
+                currentPiece.possibleMoves.some(p => samePosition(p, {x: i, y: j})) : false;
 
-            board.push(<Tile key={`${j},${i}`} image={image} position={number}/>);
-        }
+            board.push(<Tile key={`${j},${i}`} image={image} position={number} highlight={highlight} />);        }
     }
 
     return (

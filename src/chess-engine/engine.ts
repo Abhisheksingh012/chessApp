@@ -2,7 +2,7 @@ import {Piece, PieceType, Position, samePosition, TeamType} from "../constant";
 import { bishopMove } from "./rules/bishopRules";
 import { kingMove } from "./rules/kingRules";
 import { knightMove } from "./rules/knightRules";
-import { pawnMove } from "./rules/pawnRules";
+import {GetPossiblePawnMoves, pawnMove } from "./rules/pawnRules";
 import {queenMove} from "./rules/queenRules";
 import { rookMove } from "./rules/rookRules";
 
@@ -27,11 +27,13 @@ export default class Engine {
         }
     }
 
-
-
-
-
-
-
-
+    getValidMoves(piece: Piece, boardState: Piece[]) : Position[] {
+        switch(piece.pieceType)
+        {
+            case PieceType.PAWN:
+                return GetPossiblePawnMoves(piece, boardState);
+            default:
+                return [];
+        }
+    }
 }
