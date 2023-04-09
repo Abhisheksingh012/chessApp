@@ -13,5 +13,5 @@ export const rookMove = (currentPosition: Position, desiredPosition: Position, t
         direction.y = 0;
         direction.x = desiredPosition.x - currentPosition.x >= 0 ? 1 : -1;
     }
-    return false
+    return commonMovementLogic(currentPosition, desiredPosition, direction, currentBoard);
 }
