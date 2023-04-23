@@ -9,7 +9,7 @@ interface Props {
 
 export default function Tile({position,image,highlight}:Props){
     return(
-        <span className={`tile ${(position)%2?'black':'white'}-tile ${highlight?"tile-highlight":''}`}>{image && <div className='chess-piece'
+        <span className={`tile ${(position)%2?'black':'white'}-tile ${highlight?"tile-highlight":''} ${image?"tile-piece-highlight":''} `}>{image && <div className='chess-piece'
                                                                             style={{backgroundImage: `url(${image})`}}>{false}</div>}</span>)
 
 }

@@ -32,10 +32,18 @@
 .tile img {
     width: 80px;
 }
-.tile-highlight::before{
+.tile-highlight:not(.tile-piece-highlight)::before{
    content: ' ';
     width: 24px;
     height: 24px;
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.4);
+}
+.tile-highlight.tile-piece-highlight::before{
+    position: absolute;
+   content: ' ';
+    width: 90px;
+    height: 90px;
+    border:5px solid rgba(0,0,0,0.4);
+    border-radius: 50%;
 }
