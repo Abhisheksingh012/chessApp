@@ -18,14 +18,14 @@ export default function Referee() {
     }
 
     function playMove(playedPiece: Piece, destination: Position): boolean {
+        console.log(playedPiece);
+        if(playedPiece.possibleMoves === undefined) return false;
+
         let playedMoveIsValid = false;
 
-        const validMove = isValidMove(
-            playedPiece.position,
-            destination,
-            playedPiece.pieceType,
-            playedPiece.teamType
-        );
+        const validMove = playedPiece.possibleMoves?.some(m => m.samePosition(destination));
+
+        if(!validMove) return false;
 
         const enPassantMove = isEnPassantMove(
             playedPiece.position,

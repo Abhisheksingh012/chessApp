@@ -27,14 +27,3 @@ export const isTileOccupiedByOpponent=(position:Position,team:TeamType, currentB
     });
     return !!piece;
 }
-export const isEnPassantMove=(initialPosition:Position,movedPosition:Position,type:PieceType,team:TeamType,currentBoard:Piece[]):boolean=>{
-    const direction = team ? 1 : -1;
-    if(type===PieceType.PAWN && movedPosition.y-initialPosition.y===direction && (movedPosition.x-initialPosition.x===-1 || movedPosition.x-initialPosition.x===1)){
-        const piece=currentBoard.find((piece:Piece)=>{
-            return piece.samePosition(new Position(movedPosition.x,movedPosition.y-direction))  && (piece as Pawn).enPassant;
-        })
-        return !!piece;
-    }
-    return false;
-
-}

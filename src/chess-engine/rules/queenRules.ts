@@ -1,11 +1,26 @@
-import { bishopMove } from "./bishopRules";
-import { rookMove } from "./rookRules";
-import {isTileAlreadyOccupied, isTileOccupiedByOpponent} from "./generalRules";
-import {Piece, Position} from "../../models";
-import {TeamType} from "../../Types";
+import { TeamType } from "../../Types";
+import { Piece, Position } from "../../models";
+import {isTileAlreadyOccupied, isTileEmptyOrOccupiedByOpponent, isTileOccupiedByOpponent} from "./generalRules";
 
-export const queenMove=(initialPosition: Position, movedPosition: Position, team: TeamType, currentBoard: Piece[]):boolean => {
-   return bishopMove(initialPosition,movedPosition,team,currentBoard) || rookMove(initialPosition,movedPosition,team,currentBoard)
+export const queenMove = (initialPosition: Position, desiredPosition: Position, team: TeamType, boardState: Piece[]): boolean => {
+   for(let i = 1; i < 8; i++) {
+      //Diagonal
+      let multiplierX = (desiredPosition.x < initialPosition.x) ? -1 : (desiredPosition.x > initialPosition.x) ? 1 : 0;
+      let multiplierY = (desiredPosition.y < initialPosition.y) ? -1 : (desiredPosition.y > initialPosition.y) ? 1 : 0;
+
+      let passedPosition = new Position(initialPosition.x + (i * multiplierX), initialPosition.y + (i * multiplierY));
+
+      if(passedPosition.samePosition(desiredPosition)) {
+         if(isTileEmptyOrOccupiedByOpponent(passedPosition,  team,boardState)) {
+            return true;
+         }
+      } else {
+         if(isTileAlreadyOccupied(passedPosition, boardState)) {
+            break;
+         }
+      }
+   }
+   return false;
 }
 
 export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Position[] => {
@@ -13,11 +28,11 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
    // Top movement
    for(let i = 1; i < 8; i++) {
-      const destination: Position = new Position(queen.position.x, queen.position.y + i);
+      const destination = new Position(queen.position.x, queen.position.y + i);
 
       if(!isTileAlreadyOccupied(destination, boardstate)) {
          possibleMoves.push(destination);
-      } else if(isTileOccupiedByOpponent(destination, queen.teamType, boardstate)) {
+      } else if(isTileOccupiedByOpponent(destination, queen.teamType,boardstate)) {
          possibleMoves.push(destination);
          break;
       } else {
@@ -27,11 +42,11 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
    // Bottom movement
    for(let i = 1; i < 8; i++) {
-      const destination: Position = new Position(queen.position.x, queen.position.y - i);
+      const destination = new Position(queen.position.x, queen.position.y - i);
 
       if(!isTileAlreadyOccupied(destination, boardstate)) {
          possibleMoves.push(destination);
-      } else if(isTileOccupiedByOpponent(destination, queen.teamType, boardstate)) {
+      } else if(isTileOccupiedByOpponent(destination, queen.teamType,boardstate)) {
          possibleMoves.push(destination);
          break;
       } else {
@@ -41,11 +56,11 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
    // Left movement
    for(let i = 1; i < 8; i++) {
-      const destination: Position = new Position(queen.position.x -i , queen.position.y );
+      const destination = new Position(queen.position.x - i, queen.position.y);
 
       if(!isTileAlreadyOccupied(destination, boardstate)) {
          possibleMoves.push(destination);
-      } else if(isTileOccupiedByOpponent(destination, queen.teamType, boardstate)) {
+      } else if(isTileOccupiedByOpponent(destination, queen.teamType,boardstate)) {
          possibleMoves.push(destination);
          break;
       } else {
@@ -55,11 +70,11 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
    // Right movement
    for(let i = 1; i < 8; i++) {
-      const destination: Position = new Position(queen.position.x+i, queen.position.y);
+      const destination = new Position(queen.position.x + i, queen.position.y);
 
       if(!isTileAlreadyOccupied(destination, boardstate)) {
          possibleMoves.push(destination);
-      } else if(isTileOccupiedByOpponent(destination, queen.teamType, boardstate)) {
+      } else if(isTileOccupiedByOpponent(destination, queen.teamType,boardstate)) {
          possibleMoves.push(destination);
          break;
       } else {
@@ -69,11 +84,11 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
    // Upper right movement
    for(let i = 1; i < 8; i++) {
-      const destination: Position = new Position(queen.position.x+i, queen.position.y + i);
+      const destination = new Position(queen.position.x + i, queen.position.y + i);
 
       if(!isTileAlreadyOccupied(destination, boardstate)) {
          possibleMoves.push(destination);
-      } else if(isTileOccupiedByOpponent(destination, queen.teamType, boardstate)) {
+      } else if(isTileOccupiedByOpponent(destination, queen.teamType,boardstate)) {
          possibleMoves.push(destination);
          break;
       } else {
@@ -83,11 +98,11 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
    // Bottom right movement
    for(let i = 1; i < 8; i++) {
-      const destination: Position = new Position(queen.position.x, queen.position.y - i);
+      const destination = new Position(queen.position.x + i, queen.position.y - i);
 
       if(!isTileAlreadyOccupied(destination, boardstate)) {
          possibleMoves.push(destination);
-      } else if(isTileOccupiedByOpponent(destination, queen.teamType, boardstate)) {
+      } else if(isTileOccupiedByOpponent(destination, queen.teamType,boardstate)) {
          possibleMoves.push(destination);
          break;
       } else {
@@ -97,11 +112,11 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
    // Bottom left movement
    for(let i = 1; i < 8; i++) {
-      const destination: Position = new Position(queen.position.x-i, queen.position.y - i);
+      const destination = new Position(queen.position.x - i, queen.position.y - i);
 
       if(!isTileAlreadyOccupied(destination, boardstate)) {
          possibleMoves.push(destination);
-      } else if(isTileOccupiedByOpponent(destination, queen.teamType, boardstate)) {
+      } else if(isTileOccupiedByOpponent(destination, queen.teamType,boardstate)) {
          possibleMoves.push(destination);
          break;
       } else {
@@ -111,11 +126,11 @@ export const getPossibleQueenMoves = (queen: Piece, boardstate: Piece[]): Positi
 
    // Top left movement
    for(let i = 1; i < 8; i++) {
-      const destination: Position = new Position(queen.position.x-i, queen.position.y + i);
+      const destination = new Position(queen.position.x - i, queen.position.y + i);
 
       if(!isTileAlreadyOccupied(destination, boardstate)) {
          possibleMoves.push(destination);
-      } else if(isTileOccupiedByOpponent(destination, queen.teamType, boardstate)) {
+      } else if(isTileOccupiedByOpponent(destination, queen.teamType,boardstate)) {
          possibleMoves.push(destination);
          break;
       } else {
