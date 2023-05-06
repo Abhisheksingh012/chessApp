@@ -1,6 +1,6 @@
-import {Piece, Position} from "./models";
+import {Board, Piece, Position} from "./models";
 import {PieceType, TeamType} from "./Types";
-import {Board} from "./models/Board";
+
 
 export const verticalPositions = ["1", "2", "3", "4", "5", "6", "7", "8"];
 export const horizontalPositions = ["a", "b", "c", "d", "e", "f", "g", "h"];
@@ -136,4 +136,4 @@ export const initialBoard: Board = new Board([
         new Position(7, 1),
         PieceType.PAWN,
         TeamType.OUR),
-]);
+],1);

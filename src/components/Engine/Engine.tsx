@@ -10,17 +10,16 @@ export default function Referee() {
     const [promotionPawn, setPromotionPawn] = useState<Piece>();
 
     useEffect(() => {
-        updatePossibleMoves();
+        board.calculateAllMoves();
     }, []);
 
-    function updatePossibleMoves() {
-        board.calculateAllMoves();
-    }
 
     function playMove(playedPiece: Piece, destination: Position): boolean {
-        console.log(playedPiece);
         if(playedPiece.possibleMoves === undefined) return false;
-
+        if (playedPiece.teamType === TeamType.OUR
+            && board.totalTurns % 2 !== 1) return false;
+        if (playedPiece.teamType === TeamType.OPPONENT
+            && board.totalTurns % 2 !== 0) return false;
         let playedMoveIsValid = false;
 
         const validMove = playedPiece.possibleMoves?.some(m => m.samePosition(destination));
@@ -33,16 +32,14 @@ export default function Referee() {
             playedPiece.pieceType,
             playedPiece.teamType
         );
-
-        // playMove modifies the board thus we
-        // need to call setBoard
         setBoard((previousBoard) => {
-            // Playing the move
-            playedMoveIsValid = board.playMove(enPassantMove,
+            const clonedBoard = board.clone();
+            clonedBoard.totalTurns += 1;
+            playedMoveIsValid = clonedBoard.playMove(enPassantMove,
                 validMove, playedPiece,
                 destination);
 
-            return board.clone();
+            return clonedBoard;
         })
 
         // This is for promoting a pawn
@@ -88,13 +85,6 @@ export default function Referee() {
         return false;
     }
 
-    //TODO
-    //Pawn promotion!
-    //Prevent the king from moving into danger!
-    //Add castling!
-    //Add check!
-    //Add checkmate!
-    //Add stalemate!
     function isValidMove(initialPosition: Position, desiredPosition: Position, type: PieceType, team: TeamType) {
         let validMove = false;
         switch (type) {
@@ -124,8 +114,6 @@ export default function Referee() {
         if (promotionPawn === undefined) {
             return;
         }
-
-
         setBoard((previousBoard) => {
             const clonedBoard = board.clone();
             clonedBoard.pieces = clonedBoard.pieces.reduce((results, piece) => {
@@ -150,6 +138,7 @@ export default function Referee() {
 
     return (
         <>
+            <p style={{color:"white",fontSize:"24px"}}>{board.totalTurns}</p>
             {promotionPawn && <div id="pawn-promotion-modal">
                 <div className="modal-body">
                     <img onClick={() => promotePawn(PieceType.ROOK)}
