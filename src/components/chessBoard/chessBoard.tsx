@@ -1,33 +1,27 @@
-import Tile from '../tile/tile';
-import './chessBoard.css';
-import React, {useRef, useState} from "react";
-import {
-    GRID_SIZE,
-    horizontalPositions,
-    Piece,
-    Position,
-    samePosition,
-    verticalPositions
-} from "../../constant";
-
+import  { useRef, useState } from "react";
+import "./chessBoard.css";
+import { Piece, Position } from "../../models";
+import {GRID_SIZE, horizontalPositions, verticalPositions} from "../../constant";
+import Tile from "../tile/tile";
 interface Props {
-    playMove:(piece:Piece,position:Position)=>boolean,
-    pieces:Piece[]
+    playMove: (piece: Piece, position: Position) => boolean;
+    pieces: Piece[];
 }
 
-export default function ChessBoard({playMove,pieces}:Props) {
-    const [activePiece, setActivePiece] = useState<HTMLElement | null>(null)
-     const [grabPosition, setGrabPosition] = useState({x: -1, y: -1});
-    const chessBoardRef = useRef<HTMLDivElement>(null);
+export default function Chessboard({playMove, pieces} : Props) {
+    const [activePiece, setActivePiece] = useState<HTMLElement | null>(null);
+    const [grabPosition, setGrabPosition] = useState<Position>(new Position(-1, -1));
+    const chessboardRef = useRef<HTMLDivElement>(null);
+
     function grabPiece(e: React.MouseEvent) {
         const element = e.target as HTMLElement;
-        const chessboard = chessBoardRef.current;
+        const chessboard = chessboardRef.current;
         if (element.classList.contains("chess-piece") && chessboard) {
             const grabX = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
             const grabY = Math.abs(
                 Math.ceil((e.clientY - chessboard.offsetTop - 800) / GRID_SIZE)
             );
-            setGrabPosition({x: grabX, y: grabY});
+            setGrabPosition(new Position(grabX, grabY));
 
             const x = e.clientX - GRID_SIZE / 2;
             const y = e.clientY - GRID_SIZE / 2;
@@ -39,69 +33,97 @@ export default function ChessBoard({playMove,pieces}:Props) {
         }
     }
 
-
     function movePiece(e: React.MouseEvent) {
-        const chessBoard = chessBoardRef.current;
-
-        if (activePiece && chessBoard) {
-            const minLeft = chessBoard.offsetLeft - 25;
-            const minTop = chessBoard.offsetTop - 25;
-            const minRight = chessBoard.offsetLeft + chessBoard.offsetWidth - 80;
-            const minBottom = chessBoard.offsetTop + chessBoard.offsetHeight - 80;
+        const chessboard = chessboardRef.current;
+        if (activePiece && chessboard) {
+            const minX = chessboard.offsetLeft - 25;
+            const minY = chessboard.offsetTop - 25;
+            const maxX = chessboard.offsetLeft + chessboard.clientWidth - 75;
+            const maxY = chessboard.offsetTop + chessboard.clientHeight - 75;
             const x = e.clientX - 50;
             const y = e.clientY - 50;
             activePiece.style.position = "absolute";
-            activePiece.style.left = minLeft > x ? `${minLeft}px` : minRight < x ? `${minRight}px` : `${x}px`;
-            activePiece.style.top = minTop > y ? `${minTop}px` : minBottom < y ? `${minBottom}px` : `${y}px`;
+
+            //If x is smaller than minimum amount
+            if (x < minX) {
+                activePiece.style.left = `${minX}px`;
+            }
+            //If x is bigger than maximum amount
+            else if (x > maxX) {
+                activePiece.style.left = `${maxX}px`;
+            }
+            //If x is in the constraints
+            else {
+                activePiece.style.left = `${x}px`;
+            }
+
+            //If y is smaller than minimum amount
+            if (y < minY) {
+                activePiece.style.top = `${minY}px`;
+            }
+            //If y is bigger than maximum amount
+            else if (y > maxY) {
+                activePiece.style.top = `${maxY}px`;
+            }
+            //If y is in the constraints
+            else {
+                activePiece.style.top = `${y}px`;
+            }
         }
     }
 
     function dropPiece(e: React.MouseEvent) {
-        const chessBoard = chessBoardRef.current;
-        if (activePiece && chessBoard) {
-            let x = Math.floor((e.clientX - chessBoard.offsetLeft) / GRID_SIZE);
-            let y = Math.abs(Math.ceil((e.clientY - chessBoard.offsetTop - 800) / GRID_SIZE));
-            const currentPiece = pieces.find((piece) => samePosition(piece.position, grabPosition));
+        const chessboard = chessboardRef.current;
+        if (activePiece && chessboard) {
+            const x = Math.floor((e.clientX - chessboard.offsetLeft) / GRID_SIZE);
+            const y = Math.abs(
+                Math.ceil((e.clientY - chessboard.offsetTop - 800) / GRID_SIZE)
+            );
+
+            const currentPiece = pieces.find((p) =>
+                p.samePosition(grabPosition)
+            );
+
             if (currentPiece) {
-               const success= playMove(currentPiece,{x,y})
-                if(!success){
+                var succes = playMove(currentPiece.clone(), new Position(x, y));
+
+                if(!succes) {
+                    //RESETS THE PIECE POSITION
                     activePiece.style.position = "relative";
-                    activePiece.style.removeProperty('top');
-                    activePiece.style.removeProperty('left');
+                    activePiece.style.removeProperty("top");
+                    activePiece.style.removeProperty("left");
                 }
             }
             setActivePiece(null);
-
         }
     }
 
-
     let board = [];
-
 
     for (let j = verticalPositions.length - 1; j >= 0; j--) {
         for (let i = 0; i < horizontalPositions.length; i++) {
             const number = j + i + 2;
             const piece = pieces.find((p) =>
-                samePosition(p.position, {x: i, y: j})
+                p.samePosition(new Position(i, j))
             );
             let image = piece ? piece.image : undefined;
-            let currentPiece = activePiece != null ? pieces.find(p => samePosition(p.position, grabPosition)) : undefined;
-            let highlight = currentPiece?.possibleMoves ?
-                currentPiece.possibleMoves.some(p => samePosition(p, {x: i, y: j})) : false;
 
-            board.push(<Tile key={`${j},${i}`} image={image} position={number} highlight={highlight} />);        }
+            let currentPiece = activePiece != null ? pieces.find(p => p.samePosition(grabPosition)) : undefined;
+            let highlight = currentPiece?.possibleMoves ?
+                currentPiece.possibleMoves.some(p => p.samePosition(new Position(i, j))) : false;
+
+            board.push(<Tile key={`${j},${i}`} image={image} position={number} highlight={highlight} />);
+        }
     }
 
     return (
         <>
-
             <div
                 onMouseMove={(e) => movePiece(e)}
                 onMouseDown={(e) => grabPiece(e)}
                 onMouseUp={(e) => dropPiece(e)}
                 id="chessboard"
-                ref={chessBoardRef}
+                ref={chessboardRef}
             >
                 {board}
             </div>
