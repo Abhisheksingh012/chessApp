@@ -49,9 +49,12 @@ export default function Referee() {
         let promotionRow = (playedPiece.teamType === TeamType.OUR) ? 7 : 0;
 
         if (destination.y === promotionRow && playedPiece.isPawn) {
-            setPromotionPawn(playedPiece);
+            setPromotionPawn((previousPromotionPawn) => {
+                const clonedPlayedPiece = playedPiece.clone();
+                clonedPlayedPiece.position = destination.clone();
+                return clonedPlayedPiece;
+            });
         }
-
         return playedMoveIsValid;
     }
 
@@ -76,7 +79,6 @@ export default function Referee() {
                         p.isPawn &&
                         (p as Pawn).enPassant
                 );
-                console.log(piece)
                 if (piece) {
                     return true;
                 }
@@ -123,40 +125,27 @@ export default function Referee() {
             return;
         }
 
-        board.pieces = board.pieces.reduce((results, piece) => {
-            if (piece.samePiecePosition(promotionPawn)) {
-                piece.pieceType = pieceType;
-                const teamType = (piece.teamType === TeamType.OUR) ? "w" : "b";
-                let image = "";
-                switch (pieceType) {
-                    case PieceType.ROOK: {
-                        image = "rook";
-                        break;
-                    }
-                    case PieceType.BISHOP: {
-                        image = "bishop";
-                        break;
-                    }
-                    case PieceType.KNIGHT: {
-                        image = "knight";
-                        break;
-                    }
-                    case PieceType.QUEEN: {
-                        image = "queen";
-                        break;
-                    }
-                }
-                piece.image = `assets/images/${image}_${teamType}.png`;
-            }
-            results.push(piece);
-            return results;
-        }, [] as Piece[])
 
-        updatePossibleMoves();
+        setBoard((previousBoard) => {
+            const clonedBoard = board.clone();
+            clonedBoard.pieces = clonedBoard.pieces.reduce((results, piece) => {
+                if (piece.samePiecePosition(promotionPawn)) {
+                    results.push(new Piece(piece.position.clone(), pieceType,
+                        piece.teamType));
+                } else {
+                    results.push(piece);
+                }
+                return results;
+            }, [] as Piece[]);
+            clonedBoard.calculateAllMoves();
+
+            return clonedBoard;
+        })
+        setPromotionPawn(undefined);
     }
 
     function promotionTeamType() {
-        return (promotionPawn?.teamType === TeamType.OUR) ? "w" : "b";
+        return (promotionPawn?.teamType === TeamType.OUR) ? "white" : "black";
     }
 
     return (
@@ -164,13 +153,13 @@ export default function Referee() {
             {promotionPawn && <div id="pawn-promotion-modal">
                 <div className="modal-body">
                     <img onClick={() => promotePawn(PieceType.ROOK)}
-                         src={`/assets/images/rook_${promotionTeamType()}.png`} alt='rook.png'/>
+                         src={`/asset/images/${promotionTeamType()}_rook.png`} alt='rook.png'/>
                     <img onClick={() => promotePawn(PieceType.BISHOP)}
-                         src={`/assets/images/bishop_${promotionTeamType()}.png`} alt="bishop.png"/>
+                         src={`/asset/images/${promotionTeamType()}_bishop.png`} alt="bishop.png"/>
                     <img onClick={() => promotePawn(PieceType.KNIGHT)}
-                         src={`/assets/images/knight_${promotionTeamType()}.png`} alt="knight.png"/>
+                         src={`/asset/images/${promotionTeamType()}_knight.png`} alt="knight.png"/>
                     <img onClick={() => promotePawn(PieceType.QUEEN)}
-                         src={`/assets/images/queen_${promotionTeamType()}.png`} alt="queen.png"/>
+                         src={`/asset/images/${promotionTeamType()}_queen.png`} alt="queen.png"/>
                 </div>
             </div>}
             <ChessBoard playMove={playMove}
